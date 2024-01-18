@@ -1,9 +1,13 @@
-from rest_framework import viewsets 
+from rest_framework import viewsets
+from rest_framework.response import Response
+from .models import Product
+from .serializers import ProductSerializer
 
 class ProductViewSet(viewsets.ViewSet):
-
-    def list(selft, request):
-        pass
+    def list(self, request):
+        products = Product.objects.all()
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
     def create(self, request):
         pass
