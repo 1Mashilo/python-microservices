@@ -1,9 +1,9 @@
-from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import viewsets
 
-from .models import Product
-from .serializers import ProductsSerializer
+from .models import Product, User  # Import User model
 
 class ProductViewSet(viewsets.ViewSet):
     def list(self, request):
@@ -47,3 +47,9 @@ class ProductViewSet(viewsets.ViewSet):
 
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserAPIView(APIView):
+    def get(self, _):
+        users = User.objects.all()  # Use objects instead of object
+        user = random.choice(users)
+        return Response({'id': user.id})
