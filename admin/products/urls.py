@@ -1,15 +1,18 @@
 from django.urls import path
-from .views import ProductViewSet, UserAPIView  # Import UserAPIView
+from .views import ProductViewSet, UserAPIView, index
 
 urlpatterns = [
     path('products', ProductViewSet.as_view({
         'get': 'list',
         'post': 'create',
-    })),
+    }), name='product-list'),
+
     path('products/<str:pk>', ProductViewSet.as_view({
         'get': 'retrieve',
         'put': 'update',
-        'delete': 'destroy',
-    })),
-    path('users', UserAPIView.as_view()),
+        'delete': 'delete',
+    }), name='product-detail'),
+
+    path('users', UserAPIView.as_view(), name='user-list'),
+    path('index', index, name='index'),
 ]
