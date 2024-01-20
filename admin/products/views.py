@@ -1,10 +1,13 @@
+from random import choice
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from .serializers import ProductSerializer
+from .models import Product, User
+from django.http import HttpResponse
 
-from .models import Product, User  # Import User model
+def index(request):
+    return HttpResponse('hello world')
 
 class ProductViewSet(viewsets.ViewSet):
     def list(self, request):
@@ -50,7 +53,7 @@ class ProductViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class UserAPIView(APIView):
-    def get(self, _):
-        users = User.objects.all()  # Use objects instead of object
-        user = random.choice(users)
+    def get(self, request):
+        users = User.objects.all()
+        user = choice(users)
         return Response({'id': user.id})
