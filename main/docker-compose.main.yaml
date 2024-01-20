@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  backend:
+  main_backend:
     depends_on:
       - postgres_db
     build:
