@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  main_backend:
+  backend:
     depends_on:
       - postgres_db
     build:
@@ -16,11 +16,11 @@ services:
     image: postgres
     restart: always
     env_file:
-      - main/.env
+      - ./.env
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - .postgres_data:/var/lib/postgresql
 
 volumes:
   postgres_data:
