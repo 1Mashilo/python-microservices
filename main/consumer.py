@@ -1,17 +1,22 @@
 import pika
 import json
-from flask import Flask  # Replace with your actual Flask imports
-from database import db  # Replace with your actual module for database operations
-from models import Product  # Replace with your actual model definition
+from flask import Flask  
+from database import db, Product 
+import logging
+
 
 app = Flask(__name__)
 
+# Enable RabbitMQ logging in your application code
+logging.basicConfig(level=logging.DEBUG)
+pika_logger = logging.getLogger('pika')
+pika_logger.setLevel(logging.DEBUG)
+
 # RabbitMQ connection URL
-rabbitmq_url = "amqps://cavynprl:2koEdoR42NgR6EX18jlc4zTkn9BcBlhP@shark.rmq.cloudamqp.com/cavynprl"
-params = pika.URLParameters(rabbitmq_url)
+rabbitmq_url = "amqp://guest:guest@localhost:5672/"
 
 # Establish a connection
-connection = pika.BlockingConnection(params)
+connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_url))
 channel = connection.channel()
 
 # Declare a queue for communication with "admin"
@@ -48,5 +53,4 @@ channel.basic_consume(queue='admin', on_message_callback=callback, auto_ack=True
 print('Waiting for messages from "admin" (Django backend). To exit, press CTRL+C')
 channel.start_consuming()
 
-if __name__ == "__main__":
-    app.run()
+
