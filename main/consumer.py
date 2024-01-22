@@ -1,7 +1,7 @@
 import pika
 import json
 from flask import Flask  
-from database import db, Product 
+from main import db, Product 
 import logging
 
 
