@@ -3,10 +3,6 @@ import json
 
 import logging
 
-# Enable RabbitMQ logging in your application code
-logging.basicConfig(level=logging.DEBUG)
-pika_logger = logging.getLogger('pika')
-pika_logger.setLevel(logging.DEBUG)
 # RabbitMQ connection URL
 rabbitmq_url = "amqp://guest:guest@localhost:5672/"
 
