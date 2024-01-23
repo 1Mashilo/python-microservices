@@ -17,17 +17,11 @@ channel = connection.channel()
 # Declare a queue for communication with "main"
 channel.queue_declare(queue='main')
 
-def publish_to_main(message_body, content_type):
+def publish_to_main(method, body):
+    properties=pika.BasicProperties(method)
     channel.basic_publish(
         exchange='',
         routing_key='main',
-        body=json.dumps(message_body),
-        properties=pika.BasicProperties(content_type=content_type)
+        body=json.dumps(body),
+        properties=properties
     )
-
-# Example: Publishing a message from "admin" service (Django backend)
-message_body = {"id": 1, "title": "Product 1", "image": "image_url"}
-publish_to_main(message_body, content_type='product_created')
-
-# Close the RabbitMQ connection
-#connection.close()
