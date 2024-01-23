@@ -1,13 +1,14 @@
-from flask import Flask, jsonify, abort
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_cors import CORS
-from dotenv import load_dotenv
-from urllib.parse import quote_plus
 import os
-import requests
+from dotenv import load_dotenv
+from flask import Flask, jsonify, abort
+from flask_cors import CORS
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from producer import publish_to_main
-from sqlalchemy import Integer, Column, UniqueConstraint
+from sqlalchemy import Column, Integer, UniqueConstraint
+import requests
+from urllib.parse import quote_plus
+
 
 app = Flask(__name__)
 
@@ -44,7 +45,7 @@ class ProductUser(db.Model):
 @app.route('/api/products')
 def index():
     products = Product.query.all()
-    
+
     # Convert Product instances to a list of dictionaries
     products_list = []
     for product in products:
@@ -59,12 +60,12 @@ def index():
 
 @app.route('/api/products/<int:id>/like', methods=['POST'])
 def like(id):
-    req = requests.get('http://localhost:8000/api/user')
-    json = req.json()
-
     try:
-        productUser = ProductUser(user_id=json['id'], product_id=id)
-        db.session.add(productUser)
+        req = requests.get('http://localhost:8000/api/user')
+        json_data = req.json()
+
+        product_user = ProductUser(user_id=json_data['id'], product_id=id)
+        db.session.add(product_user)
         db.session.commit()
 
         publish_to_main('product_liked', id)
@@ -72,11 +73,7 @@ def like(id):
     except:
         abort(400, 'you already like the post')
 
-    return jsonify({
-
-        'message': 'success'
-    })
+    return jsonify({'message': 'success'})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
-
