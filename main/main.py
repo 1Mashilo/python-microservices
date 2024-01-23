@@ -1,10 +1,13 @@
-from flask import Flask
+from flask import Flask, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
 import os
+import requests
+from producer import publish_to_main
+from sqlalchemy import Integer, Column, UniqueConstraint
 
 app = Flask(__name__)
 
@@ -26,9 +29,54 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-@app.route('/')
+class Product(db.Model):
+    id = db.Column(Integer, primary_key=True, autoincrement=False)
+    title = db.Column(db.String(200))
+    image = db.Column(db.String(200))
+
+class ProductUser(db.Model):
+    id = Column(Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    product_id = db.Column(db.Integer)
+
+    UniqueConstraint('user_id', 'product_id', name='user_product_unique')
+
+@app.route('/api/products')
 def index():
-    return 'Hello'
+    products = Product.query.all()
+    
+    # Convert Product instances to a list of dictionaries
+    products_list = []
+    for product in products:
+        product_dict = {
+            'id': product.id,
+            'title': product.title,
+            'image': product.image
+        }
+        products_list.append(product_dict)
+
+    return jsonify(products_list)
+
+@app.route('/api/products/<int:id>/like', methods=['POST'])
+def like(id):
+    req = requests.get('http://localhost:8000/api/user')
+    json = req.json()
+
+    try:
+        productUser = ProductUser(user_id=json['id'], product_id=id)
+        db.session.add(productUser)
+        db.session.commit()
+
+        publish_to_main('product_liked', id)
+
+    except:
+        abort(400, 'you already like the post')
+
+    return jsonify({
+
+        'message': 'success'
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
+
