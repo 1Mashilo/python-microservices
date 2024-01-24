@@ -17,7 +17,7 @@ def publish_to_main(method, body):
     properties=pika.BasicProperties(method)
     channel.basic_publish(
         exchange='',
-        routing_key='main',
+        routing_key='admin',
         body=json.dumps(body),
         properties=properties
     )
