@@ -10,8 +10,8 @@ rabbitmq_url = "amqp://guest:guest@localhost:5672/"
 connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_url))
 channel = connection.channel()
 
-# Declare a queue for communication with "main"
-channel.queue_declare(queue='main')
+# Declare a queue for communication with "admin"
+channel.queue_declare(queue='admin')
 
 def publish_to_main(method, body):
     properties=pika.BasicProperties(method)
