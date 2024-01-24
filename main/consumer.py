@@ -3,7 +3,6 @@ import json
 from flask import Flask
 from main import db, Product
 from main import app 
-import logging
 
 
 # Flask application context setup
