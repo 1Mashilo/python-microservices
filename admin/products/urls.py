@@ -13,6 +13,6 @@ urlpatterns = [
         'delete': 'delete',
     }), name='product-detail'),
 
-    path('users', UserAPIView.as_view(), name='user-list'),
+    path('user', UserAPIView.as_view(), name='user-list'),
     path('index', index, name='index'),
 ]
