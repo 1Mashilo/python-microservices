@@ -30,50 +30,53 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+# ------------------------------------------------------------------------
+# Models
+
+@dataclass
 class Product(db.Model):
-    id = db.Column(Integer, primary_key=True, autoincrement=False)
+    id: int
+    title: str
+    image: str
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     title = db.Column(db.String(200))
     image = db.Column(db.String(200))
 
+@dataclass
 class ProductUser(db.Model):
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     product_id = db.Column(db.Integer)
 
     UniqueConstraint('user_id', 'product_id', name='user_product_unique')
 
+# ------------------------------------------------------------------------
+# routes
+
 @app.route('/api/products')
 def index():
-    products = Product.query.all()
-
-    # Convert Product instances to a list of dictionaries
-    products_list = []
-    for product in products:
-        product_dict = {
-            'id': product.id,
-            'title': product.title,
-            'image': product.image
-        }
-        products_list.append(product_dict)
-
-    return jsonify(products_list)
+    return jsonify(Product.query.all())
 
 @app.route('/api/products/<int:id>/like', methods=['POST'])
 def like(id):
-    try:
-        req = requests.get('http://localhost:8000/api/user')
-        json_data = req.json()
+    req = requests.get('http://docker.for.win.localhost:8000/api/user')
+    json = req.json()
 
-        product_user = ProductUser(user_id=json_data['id'], product_id=id)
-        db.session.add(product_user)
+    try:
+        productUser = ProductUser(user_id=json['id'], product_id=id)
+        db.session.add(productUser)
         db.session.commit()
 
-        publish_to_main('product_liked', id)
-
+        publish('product_liked', id)
     except:
-        abort(400, 'you already like the post')
+        abort(400, 'You already liked this product')
 
-    return jsonify({'message': 'success'})
+    return jsonify({
+        'message': 'success',
+        'id': json['id']
+    })
 
+# ------------------------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
