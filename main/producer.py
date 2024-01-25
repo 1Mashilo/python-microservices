@@ -1,23 +1,22 @@
 import pika
 import json
 
-import logging
-
-# RabbitMQ connection URL
-rabbitmq_url = "amqp://guest:guest@localhost:5672/"
-
-# Establish a connection
-connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_url))
+# Set up RabbitMQ connection parameters
+params = pika.URLParameters('your_rabbitmq_url')
+connection = pika.BlockingConnection(params)
 channel = connection.channel()
 
-# Declare a queue for communication with "admin"
-channel.queue_declare(queue='admin')
-
 def publish_to_main(method, body):
-    properties=pika.BasicProperties(method)
+    # Set up RabbitMQ message properties
+    properties = pika.BasicProperties(method)
+    
+    # Publish message to the 'admin' queue
     channel.basic_publish(
         exchange='',
         routing_key='admin',
         body=json.dumps(body),
         properties=properties
     )
+
+# Close RabbitMQ connection
+connection.close()
