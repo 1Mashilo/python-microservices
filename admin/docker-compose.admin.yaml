@@ -1,17 +1,31 @@
+# Docker Compose Configuration
 version: '3.8'
 
 services:
+  # Backend Service
   backend:
-    depends_on:
-      - postgres_db
     build:
       context: .
       dockerfile: Dockerfile
+    command: 'python manage.py runserver 0.0.0.0:8000'
     ports:
       - "8000:8000"
     volumes:
       - .:/app
+    depends_on:
+      - postgres_db
+      - queue 
 
+  # RabbitMQ Queue Service
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    command: 'python consumer.py'
+    depends_on:
+      - postgres_db
+
+  # PostgreSQL Database Service
   postgres_db:
     image: postgres
     restart: always
@@ -22,6 +36,6 @@ services:
     volumes:
       - .postgres_data:/var/lib/postgresql
 
+# Define Persistent Volume for PostgreSQL Data
 volumes:
   postgres_data:
-
