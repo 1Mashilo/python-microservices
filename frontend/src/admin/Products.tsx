@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Wrapper from './Wrapper';
-import {Product} from '../interfaces/product';
+import {Product} from '../interfaces/Product';
 import {Link} from 'react-router-dom';
 
 const Products = () => {
