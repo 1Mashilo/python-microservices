@@ -1,5 +1,5 @@
 import Wrapper from './Wrapper';
-import { Product } from '../interfaces/product';
+import { Product } from '../interfaces/Product';
 import { useState, useEffect, SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
